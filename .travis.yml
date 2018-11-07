@@ -20,4 +20,3 @@ install:
 script:
   - echo Linting...
   - npm run lint
-  - npm start
