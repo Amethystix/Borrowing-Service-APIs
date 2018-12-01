@@ -4,4 +4,12 @@ const USER = 'root';
 const PASS = 'coconuts';
 const DB = 'develop';
 
+module.exports = {
+	HOST:IP
+	,PORT:PORT
+	,USER:USER
+	,PASS:PASS
+	,DB:DB
+}
+
 

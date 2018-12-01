@@ -4,6 +4,7 @@ const router = express.Router();
 const uuidv1 = require('uuid/v1');
 const userHelper = require('../helpers/userHelper');
 const { makeError } = require('../helpers/errorHelper');
+const connectionHelper = require('../helpers/connectionHelper');
 
 router.post('/register', (req, res, next) => {
   const {
@@ -11,14 +12,20 @@ router.post('/register', (req, res, next) => {
   } = req.body;
   if (username && password && confirmPassword && email && firstName && lastName) {
     if (password === confirmPassword) {
-      // if(username exists in the db || email exists in the db) {
-      //   const err = new Error();
-      //   err.status = 409;
-      //   err.body = {
-      //     message: 'There already exists a user with this name or email',
-      //   };
-      //   res.status(409).json(err);
-      // }
+      let alreadyInDb = connectionHelper.alreadyInDB(username, email)
+                        .then(function(){ return ''})
+                        .catch(function(user){ return user}) //return true if there is a user with that username or email
+      console.log(alreadyInDb);
+
+      if(alreadyInDb) {
+        //if a user with the email or username is already in the database
+        const err = new Error();
+        err.status = 409;
+        err.body = {
+          message: 'There already exists a user with this name or email',
+        };
+        res.status(409).json(err);
+      }
       // else do the following to register the user
       const userObj = {
         username,
@@ -30,7 +37,12 @@ router.post('/register', (req, res, next) => {
       userHelper.hashPassword(password).then((encrypted) => {
         userObj.password = encrypted;
         // Add userObj to the database
-        res.status(201).json(userObj);
+        connectionHelper.registerUser(userObj)
+          .then(result => console.log(result))
+          .catch(err => next(err));
+
+          res.status(201).json(userObj)
+        
       }).catch(err => next(err));
     } else {
       const err = makeError(403, 'Passwords do not match');
@@ -59,8 +71,12 @@ router.post('/login', (req, res, next) => {
   // TODO: add optional rememberMe to extend session time
   const { username, password } = req.body;
   if (username && password) {
-    if (username === 'exists in the db (placeholder)') {
-      const hashed = 'Placeholder, should be the pass hash we get from the db';
+    //try to find the username in the database and pull the username and the hashedpassword
+    user = connectionHelper.findUser(username)
+                            .then(function(user){return user})
+                            .catch(res.status.json(makeError(401, "User not found")))
+    if (username === user.username) {
+      const hashed = user.password;
       userHelper.checkPassword(password, hashed)
         .then((result) => {
           if (result) {

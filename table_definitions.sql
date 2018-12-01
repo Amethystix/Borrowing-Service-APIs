@@ -5,8 +5,8 @@ CREATE TABLE user(
 	,username VARCHAR(100)
 	,password VARCHAR(255)
 	,firstName VARCHAR(100)
-	,lastNAme VARCHAR(100)
-	,dob DATE
+	,lastName VARCHAR(100)
+	,joinedOn DATETIME
 );
 
 CREATE TABLE friend(
@@ -18,6 +18,7 @@ CREATE TABLE friend(
 CREATE TABLE object(
 	objectId INT NOT NULL PRIMARY KEY
 	,ownerId INT NOT NULL REFERENCES user(userId)
+	,ownerName VARCHAR(255)
 	,name VARCHAR(100)
 	,picture VARCHAR(255) 
 	,price DECIMAL(20, 4)
@@ -32,4 +33,15 @@ CREATE TABLE loan(
 	,loanedBy INT REFERENCES user(userId)
 	,loanedOn DATE
 	,returnedOn DATE
+	,eventId INT UNIQUE
+);
+
+CREATE TABLE eventType(
+	eventTypeId INT AUTO INCREMENT NOT NULL PRIMARY KEY
+	,eventDesc VARCHAR(255)
+);
+
+CREATE TABLE feed(
+	userId INT REFERENCES user(userId) -- will be the main userId, who posted or who rented the object
+
 );
