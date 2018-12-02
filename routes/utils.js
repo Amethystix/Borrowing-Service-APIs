@@ -68,7 +68,7 @@ router.get('/search', (req, res, next) => {
 		else{
 			//filter by results
       results = results.filter((val) => {
-        return val.lastName.toLowerCase().includes(req.query.lastName.toLowerCase());
+        return val.lastName.toLowerCase().includes(req.query.lastName.toLowerCase()); 
       }
 		}
 	}
