@@ -13,6 +13,6 @@ router.post('/borrow', (req, res, next) => {
 
 }
 
-router.DELETE('/delete', (req, res, next) => {
+router.delete('/delete', (req, res, next) => {
 
 }
