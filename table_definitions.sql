@@ -1,6 +1,6 @@
 --User table
 CREATE TABLE user(
-	userId INT NOT NULL PRIMARY KEY
+	userId VARCHAR(255) NOT NULL PRIMARY KEY
 	,email VARCHAR(100)
 	,username VARCHAR(100)
 	,password VARCHAR(255)
