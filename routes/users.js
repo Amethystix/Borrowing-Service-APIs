@@ -4,34 +4,60 @@ const router = express.Router();
 const uuidv1 = require('uuid/v1');
 const userHelper = require('../helpers/userHelper');
 const { makeError } = require('../helpers/errorHelper');
+const connectionHelper = require('../helpers/connectionHelper');
 
 router.post('/register', (req, res, next) => {
+  //console.log(req.body);
+
   const {
     username, password, confirmPassword, email, firstName, lastName,
   } = req.body;
+
+
   if (username && password && confirmPassword && email && firstName && lastName) {
     if (password === confirmPassword) {
-      // if(username exists in the db || email exists in the db) {
-      //   const err = new Error();
-      //   err.status = 409;
-      //   err.body = {
-      //     message: 'There already exists a user with this name or email',
-      //   };
-      //   res.status(409).json(err);
-      // }
-      // else do the following to register the user
-      const userObj = {
-        username,
-        email,
-        firstName,
-        lastName,
-        uuid: uuidv1(),
-      };
-      userHelper.hashPassword(password).then((encrypted) => {
-        userObj.password = encrypted;
-        // Add userObj to the database
-        res.status(201).json(userObj);
-      }).catch(err => next(err));
+
+      connectionHelper.alreadyInDB(username, email).then((results)=>{
+        //I will try to clean this at a later date but it's working that's matter
+        if (results.length > 0){
+          const err = new Error();
+          err.status = 409;
+          err.body = {
+            message: 'There already exists a user with this name or email',
+          };
+          res.status(409).json(err);
+          next();
+        }
+
+        else{
+
+          const userObj = {
+          username,
+          email,
+          firstName,
+          lastName,
+          uuid: uuidv1(),
+          };
+
+          userHelper.hashPassword(password).then((encrypted) => {
+            userObj.password = encrypted;
+            // Add userObj to the database
+            connectionHelper.registerUser(userObj)
+              .then()
+              .catch(err => next(err));
+
+              res.status(201).json(userObj)
+              next();
+          
+            }).catch(err => next(err));
+
+        }
+
+      }).catch(err=>{ //catch for entering into database
+        next(err);
+      });
+
+
     } else {
       const err = makeError(403, 'Passwords do not match');
       res.status(403).json(err);
@@ -52,6 +78,7 @@ router.post('/register', (req, res, next) => {
       err = makeError(422, 'Unprocessable entity');
     }
     res.status(422).json(err);
+    next();
   }
 });
 
@@ -59,24 +86,43 @@ router.post('/login', (req, res, next) => {
   // TODO: add optional rememberMe to extend session time
   const { username, password } = req.body;
   if (username && password) {
-    if (username === 'exists in the db (placeholder)') {
-      const hashed = 'Placeholder, should be the pass hash we get from the db';
-      userHelper.checkPassword(password, hashed)
-        .then((result) => {
+    //console.log(connectionHelper.findUser(username));
+
+    connectionHelper.findUser(username).then(result => {
+      //console.log(result)
+      if (result.length != 1){
+        res.status(422).json(makeError(422, "User not found"));
+        next();
+      }
+      else{
+
+        user = result[0];
+        console.log(user);
+        
+        const hashed = user.password;
+        console.log(hashed);
+
+        userHelper.checkPassword(password, hashed).then((result) => {
           if (result) {
             // Log in that user!
-            res.json({ loggedIn: 'User is logged in' });
+            res.status(200).json({ loggedIn: 'User is logged in', userObj: user });
+            next();
           } else {
             res.status(401).json(makeError(401, 'Incorrect credentials'));
+            next();
           }
-        })
-        .catch((err) => {
+        }).catch((err) => {
           next(err);
         });
-    } else {
-      // User does not exist in the db
-      res.status(401).json(makeError(401, 'Incorrect credentials'));
-    }
+
+      }
+
+
+    }).catch(err =>{
+      res.status(500).json(makeError(500, 'Database Error'));
+      next();
+    });
+  
   } else {
     let err;
     if (!username) {

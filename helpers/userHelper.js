@@ -21,7 +21,7 @@ async function hashPassword(password) {
  * @return {Promise<boolean>} the promise resulting from bcrypt's compare with our password and hash
  */
 function checkPassword(password, hashed) {
-  bcrypt.compare(password, hashed);
+  return bcrypt.compare(password, hashed);
 }
 module.exports = {
   hashPassword,
