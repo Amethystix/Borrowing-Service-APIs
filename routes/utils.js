@@ -59,3 +59,5 @@ router.get('/search', (req, res, next) => {
     }
   }
 });
+
+module.exports = router;
