@@ -4,7 +4,7 @@ const router = express.Router();
 
 router.get('/feed', (req, res, next) => {
 
-}
+});
 
 router.get('/search', (req, res, next) => {
 	const results = [];
