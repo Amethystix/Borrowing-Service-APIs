@@ -7,7 +7,7 @@ const { makeError } = require('../helpers/errorHelper');
 const connectionHelper = require('../helpers/connectionHelper');
 
 router.post('/register', (req, res, next) => {
-  //console.log(req.body);
+  // console.log(req.body);
 
   const {
     username, password, confirmPassword, email, firstName, lastName,
@@ -16,10 +16,9 @@ router.post('/register', (req, res, next) => {
 
   if (username && password && confirmPassword && email && firstName && lastName) {
     if (password === confirmPassword) {
-
-      connectionHelper.alreadyInDB(username, email).then((results)=>{
-        //I will try to clean this at a later date but it's working that's matter
-        if (results.length > 0){
+      connectionHelper.alreadyInDB(username, email).then((results) => {
+        // I will try to clean this at a later date but it's working that's matter
+        if (results.length > 0) {
           const err = new Error();
           err.status = 409;
           err.body = {
@@ -27,16 +26,13 @@ router.post('/register', (req, res, next) => {
           };
           res.status(409).json(err);
           next();
-        }
-
-        else{
-
+        } else {
           const userObj = {
-          username,
-          email,
-          firstName,
-          lastName,
-          uuid: uuidv1(),
+            username,
+            email,
+            firstName,
+            lastName,
+            uuid: uuidv1(),
           };
 
           userHelper.hashPassword(password).then((encrypted) => {
@@ -46,18 +42,13 @@ router.post('/register', (req, res, next) => {
               .then()
               .catch(err => next(err));
 
-              res.status(201).json(userObj)
-              next();
-          
-            }).catch(err => next(err));
-
+            res.status(201).json(userObj);
+            next();
+          }).catch(err => next(err));
         }
-
-      }).catch(err=>{ //catch for entering into database
+      }).catch((err) => { // catch for entering into database
         next(err);
       });
-
-
     } else {
       const err = makeError(403, 'Passwords do not match');
       res.status(403).json(err);
@@ -86,24 +77,19 @@ router.post('/login', (req, res, next) => {
   // TODO: add optional rememberMe to extend session time
   const { username, password } = req.body;
   if (username && password) {
-    //console.log(connectionHelper.findUser(username));
+    // console.log(connectionHelper.findUser(username));
 
-    connectionHelper.findUser(username).then(result => {
-      //console.log(result)
-      if (result.length != 1){
-        res.status(422).json(makeError(422, "User not found"));
+    connectionHelper.findUser(username).then((result) => {
+      // console.log(result)
+      if (result.length !== 1) {
+        res.status(422).json(makeError(422, 'User not found'));
         next();
-      }
-      else{
-
-        user = result[0];
-        console.log(user);
-        
+      } else {
+        const user = result[0];
         const hashed = user.password;
-        console.log(hashed);
 
-        userHelper.checkPassword(password, hashed).then((result) => {
-          if (result) {
+        userHelper.checkPassword(password, hashed).then((success) => {
+          if (success) {
             // Log in that user!
             res.status(200).json({ loggedIn: 'User is logged in', userObj: user });
             next();
@@ -114,15 +100,11 @@ router.post('/login', (req, res, next) => {
         }).catch((err) => {
           next(err);
         });
-
       }
-
-
-    }).catch(err =>{
+    }).catch((err) => {
       res.status(500).json(makeError(500, 'Database Error'));
-      next();
+      next(err);
     });
-  
   } else {
     let err;
     if (!username) {

@@ -5,11 +5,9 @@ const PASS = 'coconuts';
 const DB = 'develop';
 
 module.exports = {
-	HOST:IP
-	,PORT:PORT
-	,USER:USER
-	,PASS:PASS
-	,DB:DB
-}
-
-
+  HOST: IP,
+  PORT,
+  USER,
+  PASS,
+  DB,
+};
