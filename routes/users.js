@@ -40,8 +40,12 @@ router.post('/register', (req, res, next) => {
               .catch(err => next(err));
             // TODO: implement rememberMe on front and backend
             const token = makeToken(userObj, false);
-            console.log(token);
-            res.status(201).json({ token });
+            const payload = {
+              username,
+              firstName,
+              lastName,
+            };
+            res.status(201).json({ token, userObj: payload });
             next();
           }).catch(err => next(err));
         }
@@ -75,13 +79,11 @@ router.post('/register', (req, res, next) => {
 router.post('/login', (req, res, next) => {
   // TODO: add optional rememberMe to extend session time
   const { username, password } = req.body;
-  if (username && password) {
-    // console.log(connectionHelper.findUser(username));
 
+  if (username && password) {
     connectionHelper.findUser(username).then((result) => {
-      // console.log(result)
       if (result.length !== 1) {
-        res.status(422).json(makeError(422, 'User not found'));
+        res.status(401).json(makeError(401, 'User not found'));
         next();
       } else {
         const user = result[0];
@@ -90,9 +92,13 @@ router.post('/login', (req, res, next) => {
         userHelper.checkPassword(password, hashed).then((success) => {
           if (success) {
             // Log in that user!
+            const userObj = {
+              firstName: user.firstName,
+              lastName: user.lastName,
+              username: user.username,
+            };
             const token = makeToken(user, false);
-            console.log(token);
-            res.status(200).json({ success: true, token });
+            res.status(200).json({ success: true, token, userObj });
             next();
           } else {
             res.status(401).json(makeError(401, 'Incorrect credentials'));
@@ -117,7 +123,7 @@ router.post('/login', (req, res, next) => {
   }
 });
 
-router.get('/auth', (req, res, next) => {
+router.get('/auth', (req, res) => {
   if (req.headers.authorization) {
     if (checkToken(req.headers.authorization)) {
       res.status(200).json({ success: true });
