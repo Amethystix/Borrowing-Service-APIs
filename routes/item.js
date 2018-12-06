@@ -16,3 +16,5 @@ router.post('/borrow', (req, res, next) => {
 router.delete('/delete', (req, res, next) => {
   console.log(req, res, next);
 });
+
+module.exports = router;
