@@ -59,7 +59,12 @@ function checkToken(token) {
   }
 }
 
+function getUserFromToken(token){
+  return jwt.decode(token);
+}
+
 module.exports = {
   makeToken,
   checkToken,
+  getUserFromToken
 };

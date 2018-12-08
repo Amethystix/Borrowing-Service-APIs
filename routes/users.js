@@ -5,7 +5,7 @@ const uuidv1 = require('uuid/v1');
 const userHelper = require('../helpers/userHelper');
 const { makeError } = require('../helpers/errorHelper');
 const connectionHelper = require('../helpers/connectionHelper');
-const { makeToken, checkToken } = require('../helpers/tokenHelper');
+const { makeToken, checkToken, getUserFromToken } = require('../helpers/tokenHelper');
 
 router.post('/register', (req, res, next) => {
   // console.log(req.body);
