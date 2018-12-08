@@ -2,11 +2,17 @@ const express = require('express');
 
 const router = express.Router();
 
-
+/** Unfinished
+ * Returns some of the most recent transactions for the feed
+ */
 router.get('/feed', (req, res, next) => {
   console.log(req, res, next);
 });
 
+/** Unfinished
+ * Search based on query criteria
+ * If no params supplied, gives in chronological order
+ */
 router.get('/search', (req, res, next) => {
   let results = [];
   console.log(res, next);
@@ -59,3 +65,5 @@ router.get('/search', (req, res, next) => {
     }
   }
 });
+
+module.exports = router;
