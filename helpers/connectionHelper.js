@@ -186,6 +186,23 @@ function getFeed(){
   return getResults(SQL, []);
 }
 
+function getObjectIdByItemName(itemName){
+  const SQL = 'SELECT objectId FROM object WHERE objectName = ?';
+  return getResults(SQL, [itemName]);
+
+}
+
+function getObjectIdByZipcode(zipCode){
+  const SQL = 'SELECT objectId FROM object WHERE zipCode = ?';
+  return getResults(SQL, [zipCode]);
+
+}
+
+function getObjectIdByName(name){
+  const SQL = 'SELECT objectId FROM object JOIN user object.ownerId = user.userId WHERE user.firstName = ? OR user.lastName = ?';
+  return getResults(SQL, [name, name]);
+}
+
 
 module.exports = {
   findUser,
@@ -197,6 +214,9 @@ module.exports = {
   returnItem,
   getFeed,
   getUserBorrowed,
-  getUserListed
+  getUserListed,
+  getObjectIdByZipcode,
+  getObjectIdByName,
+  getObjectIdByItemName
 };
 
