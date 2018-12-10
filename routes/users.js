@@ -125,7 +125,7 @@ router.post('/login', (req, res, next) => {
   }
 });
 
-router.get('/borrowed', (req, res) =>{
+router.get('/borrowed', (req, res, next) =>{
 
   const user = getUserFromToken(req.headers.authorization);
 
@@ -136,12 +136,13 @@ router.get('/borrowed', (req, res) =>{
     }
     else{
       res.status(400).json({'message':'User has no borrowed items'})
+      next();
     }
   }).catch((err) => {next(err);})
 
 });
 
-router.get('/listed',(req, res) =>{
+router.get('/listed',(req, res, next) =>{
 
   const user = getUserFromToken(req.headers.authorization);
 
@@ -151,7 +152,8 @@ router.get('/listed',(req, res) =>{
       next();
     }
     else{
-      res.status(400).json({'message':'User has no listed items'})
+      res.status(400).json({'message':'User has no listed items'});
+      next();
     }
   }).catch((err) => {next(err);})
 
