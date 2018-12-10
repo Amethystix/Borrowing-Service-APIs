@@ -7,17 +7,13 @@ const router = express.Router();
  * Returns some of the most recent transactions for the feed
  */
 router.get('/feed', (req, res, next) => {
+  conHelper.getFeed().then((results) => {
+    if (results) {
+      return res.status(200).json(results);
+    }
 
-  conHelper.getFeed().then((results)=>{
-      if (results){
-        return res.status(200).json(results);
-      }
-      else{
-        return res.status(400).json({message: 'Nothing in the feed'});
-      }
-
-  }).catch((err) => {next(err);})
-
+    return res.status(400).json({ message: 'Nothing in the feed' });
+  }).catch((err) => { next(err); });
 });
 
 /** Unfinished

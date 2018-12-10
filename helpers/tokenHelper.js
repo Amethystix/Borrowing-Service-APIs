@@ -8,7 +8,7 @@ const publicKEY = fs.readFileSync(path.join(__dirname, '../credentials/public.ke
 // Creates a JWT token
 function makeToken(user, rememberMe) {
   const {
-    username, email, firstName, lastName, userId
+    username, email, firstName, lastName, userId,
   } = user;
 
   const payload = {
@@ -60,12 +60,12 @@ function checkToken(token) {
   }
 }
 
-function getUserFromToken(token){
+function getUserFromToken(token) {
   return jwt.decode(token);
 }
 
 module.exports = {
   makeToken,
   checkToken,
-  getUserFromToken
+  getUserFromToken,
 };

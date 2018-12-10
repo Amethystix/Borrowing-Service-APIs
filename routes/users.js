@@ -125,38 +125,32 @@ router.post('/login', (req, res, next) => {
   }
 });
 
-router.get('/borrowed', (req, res, next) =>{
-
+router.get('/borrowed', (req, res, next) => {
   const user = getUserFromToken(req.headers.authorization);
 
-  connectionHelper.getUserBorrowed(user.userId).then((results)=>{
-    if (results){
+  connectionHelper.getUserBorrowed(user.userId).then((results) => {
+    if (results) {
       res.status(200).json(results);
       next();
-    }
-    else{
-      res.status(400).json({'message':'User has no borrowed items'})
+    } else {
+      res.status(400).json({ message: 'User has no borrowed items' });
       next();
     }
-  }).catch((err) => {next(err);})
-
+  }).catch((err) => { next(err); });
 });
 
-router.get('/listed',(req, res, next) =>{
-
+router.get('/listed', (req, res, next) => {
   const user = getUserFromToken(req.headers.authorization);
 
-  connectionHelper.getUserListed(user.userId).then((results)=>{
-    if (results){
+  connectionHelper.getUserListed(user.userId).then((results) => {
+    if (results) {
       res.status(200).json(results);
       next();
-    }
-    else{
-      res.status(400).json({'message':'User has no listed items'});
+    } else {
+      res.status(400).json({ message: 'User has no listed items' });
       next();
     }
-  }).catch((err) => {next(err);})
-
+  }).catch((err) => { next(err); });
 });
 
 router.get('/auth', (req, res) => {
