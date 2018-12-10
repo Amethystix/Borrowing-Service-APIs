@@ -16,7 +16,7 @@ router.get('/view', (req, res, next) => {
     conHelper.getObjectById(req.query.id).then((results)=>{
 
       if(results.length == 1){
-        res.status(200).json(req.query.id);
+        res.status(200).json(results[0]);
       }
       else{
         // if not found in db:
@@ -46,22 +46,30 @@ router.post('/add', (req, res, next) => {
       description: req.body.description ? req.body.description : '',
       imageUrl: '',
       itemId: uuidv1(),
-      ownerId = currUser.userId,
-      ownerUsername = currUser.username
+      ownerId: currUser.userId,
+      ownerUsername: currUser.username
     };
 
     conHelper.addObject(item).then((results)=>{
       if (results){
-        res.status(200).json(item);
+        res.status(200).json(results);
+        next();
       }
-    }).catch(err => next(err))
+      else{
+        res.status(400).json(makeError(400, "Database Error"));
+        next();
+      }
+    }).catch((err) => {
+      next(err);
+    });
     
   } else if (!req.body.name) {
     res.status(422).json(makeError(422, 'Required field name missing'));
+    next();
   } else if (!req.body.location) {
     res.status(422).json(makeError(422, 'Required field location missing'));
+    next();
   }
-  next();
 });
 
 /** Unfinished
@@ -69,11 +77,12 @@ router.post('/add', (req, res, next) => {
  */
 router.post('/borrow', (req, res, next) => {
   if (req.body.itemId) {
-    // TODO: implement
+
     const currUser = getUserFromToken(req.headers.authorization)
 
     conHelper.loanObject(req.body.itemId, currUser.userId, currUser.username).then((results)=>{
-      res.status(200).json(req.body.itemId)
+      res.status(200).json(results[0]);
+      next();
     }).catch(err => next(err))
 
   } else {
@@ -90,7 +99,11 @@ router.post('/return', (req, res, next) => {
     // TODO: implement returning
     const currUser = getUserFromToken(req.headers.authorization)
 
-    conHelper.returnItem(req.body.itemId, currUser.userId)
+    conHelper.returnItem(req.body.itemId, currUser.userId).then((results)=>{
+      if (results){
+        res.status(200).json(req.body.itemId)
+      }
+    }).catch(err => next(err))
   } else {
     res.status(422).json(makeError(422, 'Request expects an item id'));
     next();

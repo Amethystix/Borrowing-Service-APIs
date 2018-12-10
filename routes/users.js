@@ -24,12 +24,13 @@ router.post('/register', (req, res, next) => {
           res.status(409).json(err);
           next();
         } else {
+          const uuid = uuidv1();
           const userObj = {
             username,
             email,
             firstName,
             lastName,
-            uuid: uuidv1(),
+            uuid,
           };
 
           userHelper.hashPassword(password).then((encrypted) => {
@@ -44,6 +45,7 @@ router.post('/register', (req, res, next) => {
               username,
               firstName,
               lastName,
+              uuid,
             };
             res.status(201).json({ token, userObj: payload });
             next();
@@ -88,7 +90,6 @@ router.post('/login', (req, res, next) => {
       } else {
         const user = result[0];
         const hashed = user.password;
-
         userHelper.checkPassword(password, hashed).then((success) => {
           if (success) {
             // Log in that user!
@@ -96,6 +97,7 @@ router.post('/login', (req, res, next) => {
               firstName: user.firstName,
               lastName: user.lastName,
               username: user.username,
+              userId: user.userId,
             };
             const token = makeToken(user, false);
             res.status(200).json({ success: true, token, userObj });
@@ -121,6 +123,38 @@ router.post('/login', (req, res, next) => {
     }
     res.status(422).json(err);
   }
+});
+
+router.get('/borrowed', (req, res) =>{
+
+  const user = getUserFromToken(req.headers.authorization);
+
+  connectionHelper.getUserBorrowed(user.userId).then((results)=>{
+    if (results){
+      res.status(200).json(results);
+      next();
+    }
+    else{
+      res.status(400).json({'message':'User has no borrowed items'})
+    }
+  }).catch((err) => {next(err);})
+
+});
+
+router.get('/listed',(req, res) =>{
+
+  const user = getUserFromToken(req.headers.authorization);
+
+  connectionHelper.getUserListed(user.userId).then((results)=>{
+    if (results){
+      res.status(200).json(results);
+      next();
+    }
+    else{
+      res.status(400).json({'message':'User has no listed items'})
+    }
+  }).catch((err) => {next(err);})
+
 });
 
 router.get('/auth', (req, res) => {

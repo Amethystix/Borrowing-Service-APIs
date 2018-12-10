@@ -17,6 +17,7 @@ function getResults(SQL, values){
   return new Promise((resolve, reject)=>{
     con.query(SQL, values, (err, results)=>{
       if (err) reject(err);
+      
       else{
         resolve(results)
       }
@@ -132,6 +133,18 @@ function registerUser(userObj) {
   });
 }
 
+function getUserBorrowed(userId){
+  const SQL = 'SELECT objectName, objectId, ownerUsername, ownerId, reservedOn FROM loan WHERE loanedById = ? AND returnedOn IS NULL;'
+
+  return getResults(SQL, [userId]);
+}
+
+function getUserListed(userId){
+  const SQL = 'SELECT name, objectId, description, pictureURL, zipCode, isReserved FROM object WHERE ownerId = ?;'
+
+  return getResults(SQL, [userId]);
+}
+
 /* eslint-disable*/
 
 //object functions
@@ -143,7 +156,7 @@ function addObject(itemObj) {
        name, location, description, imageUrl, itemId, ownerId, ownerUsername
     } = itemObj;
 
-  return getResults(SQL, [objectId, ownerId, ownerUsername, name, description, pictureURL, zipCode])
+  return getResults(SQL, [itemId, ownerId, ownerUsername, name, description, imageUrl, location])
 
 }
 
@@ -156,52 +169,28 @@ function getObjectById(objectId){
 }
 
 function loanObject(objectId, userId, username) {
-  // first find the object and get the name
+//This query needs to be tested!!
+  SQL = 'INSERT INTO loan (objectId, objectName, ownerId, ownerUsername, loanedById, loanedByUsername, reservedOn, returnedOn) SELECT obj.objectId,obj.name,obj.ownerId, obj.ownerUsername,?,?,curdate(), NULL FROM object obj WHERE objectId = ?; ';
 
-  /*
-  /// object table
-  objectId INT NOT NULL PRIMARY KEY
-  ,ownerId INT NOT NULL REFERENCES user(userId)
-  ,ownerUsername VARCHAR(255)
-  ,name VARCHAR(100)
-  ,description LONGTEXT
-  ,pictureURL VARCHAR(255) 
-  ,zipCode INT
-  ,isReserved TINYINT
+  return getResults(SQL, [userId, username, objectId])
 
-  ///loan table
-
-  objectId INT REFERENCES object(objectId)
-  ,objectName VARCHAR(100)
-  ,ownerId INT REFERENCES object(ownerId)
-  ,ownerUsername VARCHAR(255)
-  ,loanedById INT REFERENCES user(userId)
-  ,loanedByUsername VARCHAR(255)
-  ,reservedOn DATE
-  ,returnedOn DATE
-  */
-  SQLToFindObject = 'SELECT ownerId, ownerUsername, name FROM object WHERE objectId = ?';
-  SQLToLoan = 'INSERT INTO loan (objectId, objectName, ownerId, ownerUsername, loanedById, loanedByUsername, reservedOn, returnedOn) VALUES (?,?,?,?,?,?,curdate, NULL)';
-
-
-  getResults(SQLToFindObject, [objectId]).then((results)=>{
-    if (results.length == 1){
-      item = results[0]
-      return getResults(SQLToLoan, [objectId, item.name, item.ownerId, item.ownerUsername, userId, username])
-    }
-    else{
-      return null
-    }
-
-  }).catch((err)=>{return err})
-
-  
 }
 
 function returnItem(itemId, userId){
-  SQL = 'UPDATE loan SET returnedOn = curdate WHERE objectId = ? AND loanedById = ? AND returnedOn IS NULL'
+  SQL = 'UPDATE loan SET returnedOn = curdate() WHERE objectId = ? AND loanedById = ? AND returnedOn IS NULL;';
 
-  return getResults(SQL, [itemId, userId])
+  return getResults(SQL, [itemId, userId]);
+}
+
+
+//feed queries
+
+function getFeed(){
+  //returns everything that is in the feed table
+
+  const SQL = "SELECT mainPersonId, mainPersonUsername, action, secondaryPersonId, secondaryPersonUsername, objectName, objectId FROM feed ORDER BY timestamp;";
+
+  return getResults(SQL, []);
 }
 
 
@@ -212,6 +201,9 @@ module.exports = {
   getObjectById,
   addObject,
   loanObject,
-  returnItem
+  returnItem,
+  getFeed,
+  getUserBorrowed,
+  getUserListed
 };
 

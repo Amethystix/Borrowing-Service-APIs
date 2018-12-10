@@ -17,8 +17,8 @@ CREATE TABLE friend(
 );
 
 CREATE TABLE object(
-	objectId INT NOT NULL PRIMARY KEY
-	,ownerId INT NOT NULL REFERENCES user(userId)
+	objectId VARCHAR(255) NOT NULL PRIMARY KEY
+	,ownerId VARCHAR(255) NOT NULL REFERENCES user(userId)
 	,ownerUsername VARCHAR(255)
 	,name VARCHAR(100)
 	,description LONGTEXT
@@ -30,11 +30,11 @@ CREATE TABLE object(
 
 CREATE TABLE loan(
 	loanId INT auto_increment NOT NULL PRIMARY KEY
-	,objectId INT REFERENCES object(objectId)
+	,objectId VARCHAR(255) REFERENCES object(objectId)
 	,objectName VARCHAR(100)
-	,ownerId INT REFERENCES object(ownerId)
+	,ownerId VARCHAR(255) REFERENCES object(ownerId)
 	,ownerUsername VARCHAR(255)
-	,loanedById INT REFERENCES user(userId)
+	,loanedById VARCHAR(255) REFERENCES user(userId)
 	,loanedByUsername VARCHAR(255)
 	,reservedOn DATE
 	,returnedOn DATE
@@ -44,11 +44,11 @@ CREATE TABLE loan(
 CREATE TABLE feed(
 	feedId INT auto_increment NOT NULL PRIMARY KEY
 	,mainPersonUsername VARCHAR(255)
-	,mainPersonId INT REFERENCES user(userId)
+	,mainPersonId VARCHAR(255) REFERENCES user(userId)
 	,secondaryPersonUsername VARCHAR(255)
-	,secondaryPersonId INT REFERENCES user(userId)
+	,secondaryPersonId VARCHAR(255) REFERENCES user(userId)
 	,objectName VARCHAR(100)
-	,objectId INT REFERENCES 
+	,objectId VARCHAR(255) REFERENCES 
 	,action VARCHAR(100)
 	,timestamp DATETIME
 );
