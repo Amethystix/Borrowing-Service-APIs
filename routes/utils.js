@@ -1,12 +1,25 @@
 const express = require('express');
+const conHelper = require('../helpers/connectionHelper');
 
 const router = express.Router();
 
-
+/** Unfinished
+ * Returns some of the most recent transactions for the feed
+ */
 router.get('/feed', (req, res, next) => {
-  console.log(req, res, next);
+  conHelper.getFeed().then((results) => {
+    if (results) {
+      return res.status(200).json(results);
+    }
+
+    return res.status(400).json({ message: 'Nothing in the feed' });
+  }).catch((err) => { next(err); });
 });
 
+/** Unfinished
+ * Search based on query criteria
+ * If no params supplied, gives in chronological order
+ */
 router.get('/search', (req, res, next) => {
   let results = [];
   console.log(res, next);
@@ -59,3 +72,5 @@ router.get('/search', (req, res, next) => {
     }
   }
 });
+
+module.exports = router;

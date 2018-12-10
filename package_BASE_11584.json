@@ -12,15 +12,8 @@
     "cookie-parser": "^1.4.3",
     "debug": "~2.6.9",
     "express": "~4.16.0",
-<<<<<<< HEAD
-    "mapred": "^0.1.0",
-=======
-    "fs": "0.0.1-security",
-    "jsonwebtoken": "^8.4.0",
->>>>>>> 6cb9f99d1316ca69fccf10abe0233227a94c1c0a
     "morgan": "~1.9.0",
     "mysql": "^2.16.0",
-    "promise": "^8.0.2",
     "uuid": "^3.3.2"
   },
   "devDependencies": {

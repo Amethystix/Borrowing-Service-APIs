@@ -5,6 +5,30 @@ const conf = require('../dbconfig');
 // results are returned as an array of objects with column names as the keys
 // TODO:can also add timeout to the query options
 
+function getResults(SQL, values) {
+  // This function is called for all queries since the structure is exactly the same
+  const con = mysql.createConnection({
+    host: conf.HOST,
+    user: conf.USER,
+    password: conf.PASS,
+    database: conf.DB,
+  });
+
+  return new Promise((resolve, reject) => {
+    con.query(SQL, values, (err, results) => {
+      if (err) reject(err);
+
+      else {
+        resolve(results);
+      }
+
+      con.end();
+    });
+  });
+}
+
+// User functions
+
 
 function findUser(username) {
   const con = mysql.createConnection({
@@ -20,13 +44,34 @@ function findUser(username) {
     con.query(SQL, [username], (err, result) => {
       if (err) reject(err);
 
-      // console.log(result);
       resolve(result);
 
       con.end();
     });
   });
 }
+
+// function getUserById(userId) {
+//   const con = mysql.createConnection({
+//     host: conf.HOST,
+//     user: conf.USER,
+//     password: conf.PASS,
+//     database: conf.DB,
+//   });
+
+//   const SQL = 'SELECT * FROM user WHERE userId = ?';
+
+//   return new Promise((resolve, reject) => {
+//     con.query(SQL, [userId], (err, result) => {
+//       if (err) reject(err);
+
+//       // console.log(result);
+//       resolve(result);
+
+//       con.end();
+//     });
+//   });
+// }
 
 
 function alreadyInDB(username, email) {
@@ -81,28 +126,64 @@ function registerUser(userObj) {
   });
 }
 
+function getUserBorrowed(userId) {
+  const SQL = 'SELECT objectName, objectId, ownerUsername, ownerId, reservedOn FROM loan WHERE loanedById = ? AND returnedOn IS NULL;';
+
+  return getResults(SQL, [userId]);
+}
+
+function getUserListed(userId) {
+  const SQL = 'SELECT name, objectId, description, pictureURL, zipCode, isReserved FROM object WHERE ownerId = ?;';
+
+  return getResults(SQL, [userId]);
+}
+
 /* eslint-disable*/
 
-function addObject(obj) {
-/* objectId INT NOT NULL PRIMARY KEY
-  ,ownerId INT NOT NULL REFERENCES user(userId)
-  ,ownerName VARCHAR(255)
-  ,name VARCHAR(100)
-  ,picture VARCHAR(255)
-  ,price DECIMAL(20, 4)
-  ,latitude DECIMAL(30, 15)
-  ,longitude DECIMAL(30, 15)
-  ,isReserved TINYINT */
+//object functions
 
-  const SQL = 'INSERT INTO object VALUES (?,?,?,?,?,?,?,?,0)';
+function addObject(itemObj) {
+
+  const SQL = 'INSERT INTO object (objectId, ownerId, ownerUsername, name, description, pictureURL, zipCode, isReserved) VALUES (?,?,?,?,?,?,?,0)';
+  const {
+       name, location, description, imageUrl, itemId, ownerId, ownerUsername
+    } = itemObj;
+
+  return getResults(SQL, [itemId, ownerId, ownerUsername, name, description, imageUrl, location])
+
 }
 
-function getObject(objectName) {
-  const SQL = 'SELECT objectId';
+
+function getObjectById(objectId){
+
+  const SQL = 'SELECT objectId, name, ownerId, ownerUsername, description, pictureURL, zipCode, isReserved FROM object WHERE objectId = ?'
+  return getResults(SQL, [objectId])
+
 }
 
-function loanObject(objectId) {
-  // first find the object and get the name
+function loanObject(objectId, userId, username) {
+//This query needs to be tested!!
+  SQL = 'INSERT INTO loan (objectId, objectName, ownerId, ownerUsername, loanedById, loanedByUsername, reservedOn, returnedOn) SELECT obj.objectId,obj.name,obj.ownerId, obj.ownerUsername,?,?,curdate(), NULL FROM object obj WHERE objectId = ?; ';
+
+  return getResults(SQL, [userId, username, objectId])
+
+}
+
+function returnItem(itemId, userId){
+  SQL = 'UPDATE loan SET returnedOn = curdate() WHERE objectId = ? AND loanedById = ? AND returnedOn IS NULL;';
+
+  return getResults(SQL, [itemId, userId]);
+}
+
+
+//feed queries
+
+function getFeed(){
+  //returns everything that is in the feed table
+
+  const SQL = "SELECT mainPersonId, mainPersonUsername, action, secondaryPersonId, secondaryPersonUsername, objectName, objectId FROM feed ORDER BY timestamp;";
+
+  return getResults(SQL, []);
 }
 
 
@@ -110,4 +191,12 @@ module.exports = {
   findUser,
   alreadyInDB,
   registerUser,
+  getObjectById,
+  addObject,
+  loanObject,
+  returnItem,
+  getFeed,
+  getUserBorrowed,
+  getUserListed
 };
+
