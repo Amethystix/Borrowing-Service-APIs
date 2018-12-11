@@ -97,7 +97,7 @@ router.post('/login', (req, res, next) => {
               firstName: user.firstName,
               lastName: user.lastName,
               username: user.username,
-              userId: user.userId,
+              uuid: user.userId,
             };
             const token = makeToken(user, false);
             res.status(200).json({ success: true, token, userObj });
@@ -155,8 +155,7 @@ router.get('/listed', (req, res, next) => {
 });
 
 router.post('/review', (req, res, next) => {
-  const username = req.body.username;
-  const rating = req.body.rating;
+  const { username, rating } = req.body;
 
   connectionHelper.addRating(username, rating).then((results) => {
     if (results) {
@@ -170,7 +169,11 @@ router.post('/review', (req, res, next) => {
 });
 
 router.get('/view', (req, res, next) => {
-  const userId = req.query.userId;
+  const { userId } = req.query;
+
+  if (userId === undefined) {
+    res.status(422).json(makeError(422, 'No user id supplied'));
+  }
 
   connectionHelper.getUserListed(userId).then((results) => {
     if (results.length > 0) {
@@ -188,14 +191,7 @@ router.get('/view', (req, res, next) => {
       res.status(200).json({ username, listedObjects: objects });
       next();
     } else {
-        connectionHelper.getUserById(userId).then((results)=>{
-          if (results){
-            res.status(200).json({username:results[0].username, listedObjects: []});
-            next();
-          }
-          else
-            res.status(404).json(makeError(404, "User doesn't exist"))
-        }).catch(err=> next(err))
+      res.status(200).json({'m':'userhas no objects'})
 
     }
   }).catch((err) => { next(err); });
