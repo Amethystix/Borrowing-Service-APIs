@@ -31,9 +31,8 @@ function getResults(SQL, values) {
 
 
 function findUser(username) {
-
   const SQL = 'SELECT * FROM user WHERE username = ?';
-  return getResults(SQL, [username])
+  return getResults(SQL, [username]);
 }
 
 // function getUserById(userId) {
@@ -60,7 +59,6 @@ function findUser(username) {
 
 
 function alreadyInDB(username, email) {
-
   const SQL = 'SELECT username, email FROM user WHERE username = ? OR email = ?';
 
   return getResults(SQL, [username, email]);
@@ -70,11 +68,10 @@ function registerUser(userObj) {
   const SQL = 'INSERT INTO user (userId, email, username, password, firstName, lastName, joinedOn) VALUES (?, ?, ?, ?, ?, ?, curdate())';
 
   const {
-      uuid, email, username, password, firstName, lastName,
+    uuid, email, username, password, firstName, lastName,
   } = userObj;
 
   return getResults(SQL, [uuid, email, username, password, firstName, lastName]);
-
 }
 
 function getUserBorrowed(userId) {
