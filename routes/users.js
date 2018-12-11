@@ -186,8 +186,17 @@ router.get('/view', (req, res, next) => {
       }));
 
       res.status(200).json({ username, listedObjects: objects });
+      next();
     } else {
-      res.status(500).json({ message: 'User has no objects' });
+        connectionHelper.getUserById(userId).then((results)=>{
+          if (results){
+            res.status(200).json({username:results[0].username, listedObjects: []});
+            next();
+          }
+          else
+            res.status(404).json(makeError(404, "User doesn't exist"))
+        }).catch(err=> next(err))
+
     }
   }).catch((err) => { next(err); });
 });

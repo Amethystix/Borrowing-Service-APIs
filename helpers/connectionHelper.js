@@ -75,6 +75,12 @@ function registerUser(userObj) {
   return getResults(SQL, [uuid, email, username, password, firstName, lastName]);
 }
 
+function getUserById(userId){
+  const SQL = 'SELECT username FROM user WHERE userId = ?';
+
+  return getResults(SQL, [userId]);
+}
+
 function getUserBorrowed(userId) {
   const SQL = 'SELECT objectName, objectId, ownerUsername, ownerId, reservedOn FROM loan WHERE loanedById = ? AND returnedOn IS NULL;';
 
@@ -146,6 +152,7 @@ module.exports = {
   findUser,
   alreadyInDB,
   registerUser,
+  getUserById,
   getObjectById,
   addObject,
   loanObject,

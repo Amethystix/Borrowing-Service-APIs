@@ -24,6 +24,5 @@ app.use('/utils', utilsRouter);
 app.use('/item', itemRouter);
 app.use('/users', usersRouter);
 
-app.listen(5000);
 
 module.exports = app;
