@@ -24,10 +24,6 @@ app.use('/', indexRouter);
 app.use('/utils', utilsRouter);
 app.use('/item', itemRouter);
 app.use('/users', usersRouter);
-<<<<<<< HEAD
-
-=======
 app.use('/reviews', mapReduce);
->>>>>>> fe1d5258292ff822d01ec6541fd91beec26d7439
 
 module.exports = app;
