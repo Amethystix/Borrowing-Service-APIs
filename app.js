@@ -26,6 +26,4 @@ app.use('/item', itemRouter);
 app.use('/users', usersRouter);
 app.use('/mr', mapReduce);
 
-app.listen(5000);
-
 module.exports = app;
