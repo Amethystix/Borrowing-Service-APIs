@@ -72,9 +72,9 @@ const secondPromise = firstPromise.then(list => new Promise(((fulfill, reject) =
 
 // Writes to a file to be read later
 secondPromise.then((data) => {
-  fs.writeFileSync('output.json', JSON.stringify(data), 'utf8', (err) => {
+  fs.writeFile('output.json', JSON.stringify(data), 'utf8', (err) => {
     if (err) {
-      return console.log(err);
+      console.log(err);
     }
 
     console.log('The file was saved!');
