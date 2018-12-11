@@ -31,24 +31,8 @@ function getResults(SQL, values) {
 
 
 function findUser(username) {
-  const con = mysql.createConnection({
-    host: conf.HOST,
-    user: conf.USER,
-    password: conf.PASS,
-    database: conf.DB,
-  });
-
   const SQL = 'SELECT * FROM user WHERE username = ?';
-
-  return new Promise((resolve, reject) => {
-    con.query(SQL, [username], (err, result) => {
-      if (err) reject(err);
-
-      resolve(result);
-
-      con.end();
-    });
-  });
+  return getResults(SQL, [username]);
 }
 
 // function getUserById(userId) {
@@ -75,55 +59,19 @@ function findUser(username) {
 
 
 function alreadyInDB(username, email) {
-  const con = mysql.createConnection({
-    host: conf.HOST,
-    user: conf.USER,
-    password: conf.PASS,
-    database: conf.DB,
-  });
-  // let user = null;
-
-
   const SQL = 'SELECT username, email FROM user WHERE username = ? OR email = ?';
 
-  return new Promise((resolve, reject) => {
-    con.query(SQL, [username, email], (err, results) => {
-      // try putting the entire results into the resolve and error checking from there
-
-      if (err) reject(err);
-
-      resolve(results);
-
-      con.end();
-    });
-  });
+  return getResults(SQL, [username, email]);
 }
 
 function registerUser(userObj) {
   const SQL = 'INSERT INTO user (userId, email, username, password, firstName, lastName, joinedOn) VALUES (?, ?, ?, ?, ?, ?, curdate())';
 
-  const con = mysql.createConnection({
-    host: conf.HOST,
-    user: conf.USER,
-    password: conf.PASS,
-    database: conf.DB,
-  });
+  const {
+    uuid, email, username, password, firstName, lastName,
+  } = userObj;
 
-  return new Promise((resolve, reject) => {
-    const {
-      uuid, email, username, password, firstName, lastName,
-    } = userObj;
-    con.query(SQL, [uuid, email, username, password, firstName, lastName],
-      (err, result) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(result);
-        }
-      });
-
-    con.end();
-  });
+  return getResults(SQL, [uuid, email, username, password, firstName, lastName]);
 }
 
 function getUserBorrowed(userId) {
@@ -133,7 +81,7 @@ function getUserBorrowed(userId) {
 }
 
 function getUserListed(userId) {
-  const SQL = 'SELECT name, objectId, description, pictureURL, zipCode, isReserved FROM object WHERE ownerId = ?;';
+  const SQL = 'SELECT ownerUsername, name, objectId, description, pictureURL, zipCode, isReserved FROM object WHERE ownerId = ?;';
 
   return getResults(SQL, [userId]);
 }
@@ -181,9 +129,15 @@ function returnItem(itemId, userId){
 function getFeed(){
   //returns everything that is in the feed table
 
-  const SQL = "SELECT mainPersonId, mainPersonUsername, action, secondaryPersonId, secondaryPersonUsername, objectName, objectId FROM feed ORDER BY timestamp;";
+  const SQL = "SELECT mainPersonId, mainPersonUsername, action, secondaryPersonId, secondaryPersonUsername, objectName, objectId FROM feed ORDER BY timestamp DESC;";
 
   return getResults(SQL, []);
+}
+
+//review
+function addRating(username, rating){
+  const SQL = "INSERT INTO review (userId, username, rating) SELECT user.userId, user.username, ? FROM user WHERE username = ?"
+  return getResults(SQL, [rating, username]);
 }
 
 
@@ -197,6 +151,7 @@ module.exports = {
   returnItem,
   getFeed,
   getUserBorrowed,
-  getUserListed
+  getUserListed,
+  addRating
 };
 
