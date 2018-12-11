@@ -1,3 +1,6 @@
+# MapReduce output
+helpers/output.json
+
 # Logs
 logs
 *.log

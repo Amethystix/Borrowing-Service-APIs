@@ -7,7 +7,7 @@ const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const utilsRouter = require('./routes/utils');
 const itemRouter = require('./routes/item');
-const mapReduce = require('./routes/mapRedReviews');
+const mapReduce = require('./routes/mapReduce');
 
 const setHeaders = require('./middleware/setHeaders');
 
@@ -24,6 +24,6 @@ app.use('/', indexRouter);
 app.use('/utils', utilsRouter);
 app.use('/item', itemRouter);
 app.use('/users', usersRouter);
-app.use('/mr', mapReduce);
+app.use('/reviews', mapReduce);
 
 module.exports = app;
