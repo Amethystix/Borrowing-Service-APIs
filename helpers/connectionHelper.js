@@ -75,6 +75,8 @@ function registerUser(userObj) {
   return getResults(SQL, [uuid, email, username, password, firstName, lastName]);
 }
 
+
+
 function getUserBorrowed(userId) {
   const SQL = 'SELECT objectName, objectId, ownerUsername, ownerId, reservedOn FROM loan WHERE loanedById = ? AND returnedOn IS NULL;';
 
@@ -142,6 +144,12 @@ function addRating(username, rating){
 }
 
 
+function getUserById(userId){
+  const SQL = 'SELECT username FROM user WHERE userId = ?';
+
+  return getResults(SQL, [userId]);
+}
+
 module.exports = {
   findUser,
   alreadyInDB,
@@ -153,6 +161,8 @@ module.exports = {
   getFeed,
   getUserBorrowed,
   getUserListed,
-  addRating
+  addRating,
+  getUserById,
+
 };
 
