@@ -170,6 +170,30 @@ router.post('/review', (req, res, next)=>{
   }).catch((err)=>{next(err);})
 });
 
+router.get('/view', (req, res, next)=>{
+  const userId = req.query.userId;
+
+  connectionHelper.getUserListed(userId).then((results)=>{
+    if (results.length > 0){
+      const username = results[0].ownerUsername
+
+      const objects = results.map((obj)=>{
+        return { objectId: obj.objectId,
+          objectName: obj.name,
+          description: obj.description,
+          pictureURL: obj.pictureURL,
+          zipCode: obj.zipCode,
+          isReserved: obj.isReserved,}
+        });
+
+      res.status(200).json({'username': username, "listedObjects": objects})
+    } else {
+      res.status(500).json({'message': 'User has no objects'});
+    }
+
+  }).catch((err)=>{next(err);})
+
+});
 
 router.get('/auth', (req, res) => {
   if (req.headers.authorization) {

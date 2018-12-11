@@ -84,7 +84,7 @@ function getUserBorrowed(userId) {
 }
 
 function getUserListed(userId) {
-  const SQL = 'SELECT name, objectId, description, pictureURL, zipCode, isReserved FROM object WHERE ownerId = ?;';
+  const SQL = 'SELECT ownerUsername, name, objectId, description, pictureURL, zipCode, isReserved FROM object WHERE ownerId = ?;';
 
   return getResults(SQL, [userId]);
 }
