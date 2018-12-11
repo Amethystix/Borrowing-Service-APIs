@@ -12,6 +12,7 @@ function getResults(SQL, values) {
     user: conf.USER,
     password: conf.PASS,
     database: conf.DB,
+    multipleStatements: true,
   });
 
   return new Promise((resolve, reject) => {
@@ -111,16 +112,16 @@ function getObjectById(objectId){
 
 function loanObject(objectId, userId, username) {
 //This query needs to be tested!!
-  SQL = 'INSERT INTO loan (objectId, objectName, ownerId, ownerUsername, loanedById, loanedByUsername, reservedOn, returnedOn) SELECT obj.objectId,obj.name,obj.ownerId, obj.ownerUsername,?,?,curdate(), NULL FROM object obj WHERE objectId = ?; ';
+  SQL = 'INSERT INTO loan (objectId, objectName, ownerId, ownerUsername, loanedById, loanedByUsername, reservedOn, returnedOn) SELECT obj.objectId,obj.name,obj.ownerId, obj.ownerUsername,?,?,curdate(), NULL FROM object obj WHERE objectId = ?; UPDATE object SET isReserved = 1 WHERE objectId = ?; ';
 
-  return getResults(SQL, [userId, username, objectId])
+  return getResults(SQL, [userId, username, objectId, objectId])
 
 }
 
 function returnItem(itemId, userId){
-  SQL = 'UPDATE loan SET returnedOn = curdate() WHERE objectId = ? AND loanedById = ? AND returnedOn IS NULL;';
+  SQL = 'UPDATE loan SET returnedOn = curdate() WHERE objectId = ? AND loanedById = ? AND returnedOn IS NULL; UPDATE object SET isReserved = 0 WHERE objectId = ?;';
 
-  return getResults(SQL, [itemId, userId]);
+  return getResults(SQL, [itemId, userId, itemId]);
 }
 
 
