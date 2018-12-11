@@ -75,7 +75,7 @@ router.post('/borrow', (req, res, next) => {
     const currUser = getUserFromToken(req.headers.authorization);
 
     conHelper.loanObject(req.body.itemId, currUser.userId, currUser.username).then((results) => {
-      res.status(200).json(results[0]);
+      res.status(200).json({ success: true });
       next();
     }).catch(err => next(err));
   } else {
