@@ -48,7 +48,7 @@ router.post('/add', (req, res, next) => {
 
     conHelper.addObject(item).then((results) => {
       if (results) {
-        res.status(200).json(results);
+        res.status(200).json({ id: item.itemId });
         next();
       } else {
         res.status(400).json(makeError(400, 'Database Error'));
