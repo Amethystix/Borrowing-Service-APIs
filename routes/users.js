@@ -125,6 +125,7 @@ router.post('/login', (req, res, next) => {
   }
 });
 
+
 router.get('/borrowed', (req, res, next) => {
   const user = getUserFromToken(req.headers.authorization);
 
@@ -153,6 +154,23 @@ router.get('/listed', (req, res, next) => {
   }).catch((err) => { next(err); });
 });
 
+router.post('/review', (req, res, next)=>{
+  const username = req.body.username;
+  const rating = req.body.rating;
+
+  connectionHelper.addRating(username, rating).then((results)=>{
+    if (results){
+      res.status(200).json({'user':username, 'rate':rating});
+      next();
+    }
+    else{
+      res.status(500).json('database Error');
+      next();
+    }
+  }).catch((err)=>{next(err);})
+});
+
+
 router.get('/auth', (req, res) => {
   if (req.headers.authorization) {
     if (checkToken(req.headers.authorization)) {
@@ -164,5 +182,7 @@ router.get('/auth', (req, res) => {
     res.status(403).json(makeError(403, 'Auth header not present'));
   }
 });
+
+
 
 module.exports = router;

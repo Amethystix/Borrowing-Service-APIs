@@ -34,6 +34,7 @@ router.get('/view', (req, res, next) => {
 router.post('/add', (req, res, next) => {
   if (req.body.name && req.body.zipCode) {
     // TODO: Add image to google bucket and populate imageUrl
+    
     const currUser = getUserFromToken(req.headers.authorization);
 
     const item = {
