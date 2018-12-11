@@ -1,7 +1,7 @@
 const express = require('express');
 const mysql = require('mysql');
 const Promise = require('promise');
-const dbConfig = require('../dbConfig.js');
+const dbConfig = require('../dbconfig.js');
 
 const router = express.Router();
 const mapreduce = require('mapred')();
@@ -59,7 +59,7 @@ router.get('/mapReduceReviews', (req, res, next) => {
   // Performs MapReduce job
   firstPromise.then((data) => {
     mapreduce(data, map, reduce, (result) => {
-      res.send(JSON.stringify(result));
+      res.json(result);
       next();
     });
   });
