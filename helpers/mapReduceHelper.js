@@ -77,7 +77,7 @@ secondPromise.then((data) => {
       console.log(err);
     }
 
-    console.log('The file was saved!');
+    console.log('The data processing has finished.');
     process.exit();
   });
 });

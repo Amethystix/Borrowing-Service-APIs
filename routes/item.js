@@ -43,7 +43,7 @@ router.post('/add', (req, res, next) => {
       description: req.body.description ? req.body.description : '',
       imageUrl: '',
       itemId: uuidv1(),
-      ownerId: currUser.userId,
+      ownerId: currUser.uuid,
       ownerUsername: currUser.username,
     };
 
