@@ -15,6 +15,7 @@ const connection = mysql.createConnection({
 
 /* eslint-disable */
 
+
 // Map function
 const map = function (key, value) {
   const list = [];
@@ -43,50 +44,107 @@ const reduce = function (key, values) {
 };
 
 
-// First reads the data from database
-const firstPromise = new Promise(((fulfill, reject) => {
-  const information = [];
-  connection.query('SELECT * FROM review', (error, rows, fields) => {
-    if (error) {
-      reject(error);
-    } else {
-      rows.forEach((element) => {
-        information.push([element.userId, element.rating]);
+setInterval(function() {
+  
+  //First reads the data from database
+  const firstPromise = new Promise(((fulfill, reject) => {
+
+    const information = [];
+
+    connection.query('SELECT * FROM review', (error, rows, fields) => {
+      if (error) {
+        reject("Problem reading from the database to perform MapReduce.");
+      } 
+
+      else {
+        rows.forEach((element) => {
+          information.push([element.userId, element.rating]);
+        });
+      }
+
+      console.log("Data pulled from database.");
+      fulfill(information);
+    });
+
+  }));
+
+  // Performs MapReduce job and send the data to be written into a file
+  const secondPromise = firstPromise.then(list => new Promise(((fulfill, reject) => {
+
+    mapreduce(list, map, reduce, (result) => {
+
+      if (result.length === 0) {
+        reject("MapReduce operation failed");
+      } 
+
+      else {
+        console.log("Mapreduce performed.");
+        fulfill(result);
+      }
+
+    });
+  })));
+
+  //Third promise writes to output.json file to be read by front-end
+  const thirdPromise = secondPromise.then(data => new Promise(((fulfill, reject) => {
+
+    fs.writeFile('output.json', JSON.stringify(data), 'utf8', (err) => {
+      if (err) {
+        reject("Problem writing MapReduce results to file.");
+      } 
+
+      else
+        fulfill('The data processing results have been written to output.json.');
+    });
+
+  })));
+
+  //Fourth promise reads from the file and updates the user table in the database
+  const fourthPromise = thirdPromise.then((data) => new Promise(((fulfill, reject) => {
+    
+    console.log(data);
+
+    //Reads from the file
+    var obj = JSON.parse(fs.readFileSync('output.json', 'utf8'));
+
+    //template sql query
+    const sql = `UPDATE user
+                SET averageReview = ?
+                WHERE userId = ?`;
+
+    //updates the database for every user
+    for (var property in obj) {
+      var string = [obj[property], property];
+
+      connection.query(sql, string,  function(err, res){
+        if(err)
+          reject("Problem updating the database with new MapReduce results.");
       });
     }
 
-    fulfill(information);
+    fulfill("User table in the database has been updated with updated average reviews at ");
+  })));
+
+  fourthPromise.then(data => {
+    var d = new Date();
+    console.log(data + ' --- ' + d);
   });
-}));
 
-// Performs MapReduce job and returns the result as a JSON
-const secondPromise = firstPromise.then(list => new Promise(((fulfill, reject) => {
-  mapreduce(list, map, reduce, (result) => {
-    if (result.length === 0) {
-      reject(true);
-    } else {
-      fulfill(result);
-    }
+  firstPromise.catch((val) => {
+    console.log({ 'Problem connecting the Database': val });
   });
-})));
 
-// Writes to a file to be read later
-secondPromise.then((data) => {
-  fs.writeFile('output.json', JSON.stringify(data), 'utf8', (err) => {
-    if (err) {
-      console.log(err);
-    }
-
-    console.log('The data processing has finished.');
-    process.exit();
+  secondPromise.catch((val) => {
+    console.log({ 'Problem performing MapReduce': val });
   });
-});
+
+  thirdPromise.catch((val) => {
+    console.log({ 'Problem writing MapReduce results to the file': val });
+  });
+
+  fourthPromise.catch((val) => {
+    console.log({ 'Problem performing MapReduce': val });
+  });
 
 
-firstPromise.catch((val) => {
-  console.log({ 'Problem connecting the Database': val });
-});
-
-secondPromise.catch((val) => {
-  console.log({ 'Problem performing MapReduce': val });
-});
+}, 18000000); 
