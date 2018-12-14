@@ -114,9 +114,9 @@ setInterval(function() {
 
     //updates the database for every user
     for (var property in obj) {
-      var string = [obj[property], property];
+      var newData = [obj[property], property];
 
-      connection.query(sql, string,  function(err, res){
+      connection.query(sql, newData,  function(err, res){
         if(err)
           reject("Problem updating the database with new MapReduce results.");
       });
