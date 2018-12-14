@@ -127,7 +127,7 @@ setInterval(function() {
 
   fourthPromise.then(data => {
     var d = new Date();
-    console.log(data + ' --- ' + d);
+    console.log(data + ' --- ' + d + '\n\n');
   });
 
   firstPromise.catch((val) => {
@@ -147,4 +147,4 @@ setInterval(function() {
   });
 
 
-}, 18000000); 
+}, 1800000); 
