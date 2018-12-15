@@ -136,6 +136,22 @@ function getFeed(){
 
   return getResults(SQL, []);
 }
+function getObjectIdByItemName(itemName){
+  const SQL = 'SELECT objectId, name, ownerId, ownerUsername, description, pictureURL, zipCode, isReserved FROM object WHERE objectName LIKE %?%';
+  return getResults(SQL, [itemName]);
+
+}
+
+function getObjectIdByZipcode(zipCode){
+  const SQL = 'SELECT objectId, name, ownerId, ownerUsername, description, pictureURL, zipCode, isReserved FROM object WHERE zipCode = ?';
+  return getResults(SQL, [zipCode]);
+
+}
+
+function getObjectIdByName(name){
+  const SQL = 'SELECT objectId, name, ownerId, ownerUsername, description, pictureURL, zipCode, isReserved FROM object WHERE user.firstName LIKE %?% OR user.lastName LIKE %?%';
+  return getResults(SQL, [name, name]);
+}
 
 //review
 function addRating(username, rating){
@@ -161,8 +177,10 @@ module.exports = {
   getFeed,
   getUserBorrowed,
   getUserListed,
+  getObjectIdByZipcode,
+  getObjectIdByName,
+  getObjectIdByItemName,
   addRating,
   getUserById,
-
 };
 
