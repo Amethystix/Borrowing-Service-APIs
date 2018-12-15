@@ -12,14 +12,14 @@ router.get('/feed', (req, res, next) => {
       return res.status(200).json(results);
     }
 
-    return res.status(400).json({ message: 'Nothing in the feed' });
+    return (400).json({ message: 'Nothing in the feed' });
   }).catch((err) => { next(err); });
 });
 
 /** Unfinished
  * Search based on query criteria
  * If no params supplied, gives in chronological order
- */
+ */res.status
 router.get('/search', (req, res, next) => {
   let results = [];
   console.log(res, next);
@@ -32,13 +32,11 @@ router.get('/search', (req, res, next) => {
       // get from database
       results = conHelper.getObjectIdByItemName(req.query.itemName);
 
-      return res.status(200).json(results);
-
     } else {
       // filter by results
       results = results.filter(val => val.itemName.toLowerCase()
         .includes(req.query.itemName.toLowerCase()));
-      return res.status(200).json(results);
+
     }
   }
 
@@ -51,7 +49,6 @@ router.get('/search', (req, res, next) => {
     } else {
       // filter by results
       results = results.filter(val => val.zipcode.equals(req.query.zipcode));
-      return res.status(200).json(results);
     }
   }
 
@@ -59,12 +56,12 @@ router.get('/search', (req, res, next) => {
     if (results.length <= 0) {
       // get from database
       results = conHelper.getUserListed(req.query.username);
-      return res.status(200).json(results);
+
     } else {
       // filter by results
       results = results.filter(val => val.username.toLowerCase()
         .includes(req.query.username.toLowerCase()));
-      return res.status(200).json(results);
+
     }
   }
 
@@ -72,8 +69,7 @@ router.get('/search', (req, res, next) => {
     if (results.length <= 0) {
       // get from database
       results = conHelper.getObjectIdByName(req.query.name);
-      
-      return res.status(200).json(results);
+
 
     } else {
       // filter by results
@@ -85,8 +81,10 @@ router.get('/search', (req, res, next) => {
             .includes(val.lastName.toLowerCase())
             && req.query.name.toLowerCase()
               .includes(val.firstName.toLowerCase()))));
-      return res.status(200).json(results);
+
     }
+    
+    res.status(200).json(results);
   }
 });
 
