@@ -30,10 +30,8 @@ router.get('/search', (req, res, next) => {
     // search for item name with given string
     if (results.length <= 0) {
       // get from database
-      let ids = conHelper.getObjectIdByItemName(req.query.itemName);
-      for(let i = 0; i < ids.length; i++){
-        results[i] = conHelper.getObjectById(ids[i]);
-      }
+      results = conHelper.getObjectIdByItemName(req.query.itemName);
+
       return res.status(200).json(results);
 
     } else {
@@ -47,10 +45,8 @@ router.get('/search', (req, res, next) => {
   if (req.query.zipcode) {
     if (results.length <= 0) {
       // get from database
-      let ids = conHelper.getObjectIdByZipcode(req.query.zipcode);
-      for(let i = 0; i < ids.length; i++){
-        results[i] = conHelper.getObjectById(ids[i]);
-      }
+      results = conHelper.getObjectIdByZipcode(req.query.zipcode);
+      
       return res.status(200).json(results);
     } else {
       // filter by results
@@ -75,10 +71,8 @@ router.get('/search', (req, res, next) => {
   if (req.query.name) {
     if (results.length <= 0) {
       // get from database
-      let ids = conHelper.getObjectIdByName(req.query.name);
-      for(let i = 0; i < ids.length; i++){
-        results[i] = conHelper.getObjectById(ids[i]);
-      }
+      results = conHelper.getObjectIdByName(req.query.name);
+      
       return res.status(200).json(results);
 
     } else {
