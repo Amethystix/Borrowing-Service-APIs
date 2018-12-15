@@ -178,7 +178,6 @@ router.get('/view', (req, res, next) => {
   connectionHelper.getUserListed(userId).then((results) => {
     if (results.length > 0) {
       const username = results[0].ownerUsername;
-
       const objects = results.map(obj => ({
         objectId: obj.objectId,
         objectName: obj.name,

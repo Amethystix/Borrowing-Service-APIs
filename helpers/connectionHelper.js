@@ -75,8 +75,6 @@ function registerUser(userObj) {
   return getResults(SQL, [uuid, email, username, password, firstName, lastName]);
 }
 
-
-
 function getUserBorrowed(userId) {
   const SQL = 'SELECT objectName, objectId, ownerUsername, ownerId, reservedOn FROM loan WHERE loanedById = ? AND returnedOn IS NULL;';
 
@@ -136,20 +134,20 @@ function getFeed(){
 
   return getResults(SQL, []);
 }
-function getObjectIdByItemName(itemName){
-  const SQL = 'SELECT objectId, name, ownerId, ownerUsername, description, pictureURL, zipCode, isReserved FROM object WHERE objectName LIKE %?%';
+function getObjectByItemName(itemName){
+  const SQL = "SELECT objectId, name, ownerId, ownerUsername, description, pictureURL, zipCode, isReserved FROM object WHERE name LIKE CONCAT('%', ?, '%')";
   return getResults(SQL, [itemName]);
 
 }
 
-function getObjectIdByZipcode(zipCode){
+function getObjectByZipcode(zipCode){
   const SQL = 'SELECT objectId, name, ownerId, ownerUsername, description, pictureURL, zipCode, isReserved FROM object WHERE zipCode = ?';
   return getResults(SQL, [zipCode]);
 
 }
 
-function getObjectIdByName(name){
-  const SQL = 'SELECT objectId, name, ownerId, ownerUsername, description, pictureURL, zipCode, isReserved FROM object WHERE user.firstName LIKE %?% OR user.lastName LIKE %?%';
+function getObjectByOwnerName(name){
+  const SQL = "SELECT objectId, name, ownerId, ownerUsername, description, pictureURL, zipCode, isReserved FROM object WHERE user.firstName LIKE CONCAT('%', ?, '%') OR user.lastName LIKE CONCAT('%', ?, '%')";
   return getResults(SQL, [name, name]);
 }
 
@@ -177,9 +175,9 @@ module.exports = {
   getFeed,
   getUserBorrowed,
   getUserListed,
-  getObjectIdByZipcode,
-  getObjectIdByName,
-  getObjectIdByItemName,
+  getObjectByZipcode,
+  getObjectByOwnerName,
+  getObjectByItemName,
   addRating,
   getUserById,
 };

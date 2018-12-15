@@ -16,75 +16,108 @@ router.get('/feed', (req, res, next) => {
   }).catch((err) => { next(err); });
 });
 
-/** Unfinished
+/**
  * Search based on query criteria
  * If no params supplied, gives in chronological order
- */res.status
+ */
 router.get('/search', (req, res, next) => {
   let results = [];
-  console.log(res, next);
 
   // take in query parameters: item name, zip, username, name
 
   if (req.query.itemName) {
     // search for item name with given string
-    if (results.length <= 0) {
-      // get from database
-      results = conHelper.getObjectIdByItemName(req.query.itemName);
-
-    } else {
-      // filter by results
-      results = results.filter(val => val.itemName.toLowerCase()
-        .includes(req.query.itemName.toLowerCase()));
-
-    }
+    conHelper.getObjectByItemName(req.query.itemName)
+      .then((success) => {
+        results = success.map(item => ({
+          objectId: item.objectId,
+          name: item.name,
+          ownerId: item.ownerId,
+          ownerUsername: item.ownerUsername,
+          description: item.description,
+          zipCode: item.zipCode,
+          isReserved: item.isReserved,
+        }));
+        res.status(200).json(results);
+        next();
+      }).catch((err) => {
+        next(err);
+      });
+  }
+  else if (req.query.zipCode) {
+    // get from database
+    conHelper.getObjectByZipcode(req.query.zipCode)
+      .then((success) => {
+        results = success.map(item => ({
+          objectId: item.objectId,
+          name: item.name,
+          ownerId: item.ownerId,
+          ownerUsername: item.ownerUsername,
+          description: item.description,
+          zipCode: item.zipCode,
+          isReserved: item.isReserved,
+        }));
+        res.status(200).json(results);
+        next();
+      }).catch((err) => {
+        next(err);
+      });
+  }
+  else if (req.query.username) {
+    // get from database
+    conHelper.getUserListed(req.query.username)
+      .then((success) => {
+        results = success.map(item => ({
+          objectId: item.objectId,
+          name: item.name,
+          ownerId: item.ownerId,
+          ownerUsername: item.ownerUsername,
+          description: item.description,
+          zipCode: item.zipCode,
+          isReserved: item.isReserved,
+        }));
+        res.status(200).json(results);
+        next();
+      }).catch((err) => {
+        next(err);
+      });
   }
 
-  if (req.query.zipcode) {
-    if (results.length <= 0) {
-      // get from database
-      results = conHelper.getObjectIdByZipcode(req.query.zipcode);
-      
-      return res.status(200).json(results);
-    } else {
-      // filter by results
-      results = results.filter(val => val.zipcode.equals(req.query.zipcode));
-    }
-  }
-
-  if (req.query.username) {
-    if (results.length <= 0) {
-      // get from database
-      results = conHelper.getUserListed(req.query.username);
-
-    } else {
-      // filter by results
-      results = results.filter(val => val.username.toLowerCase()
-        .includes(req.query.username.toLowerCase()));
-
-    }
-  }
-
-  if (req.query.name) {
-    if (results.length <= 0) {
-      // get from database
-      results = conHelper.getObjectIdByName(req.query.name);
-
-
-    } else {
-      // filter by results
-      results = results.filter(val => (val.firstName.toLowerCase()
-        .includes(req.query.name.toLowerCase())
-          || val.lastName.toLowerCase()
-            .includes(req.query.name.toLowerCase())
-          || (req.query.name.toLowerCase()
-            .includes(val.lastName.toLowerCase())
-            && req.query.name.toLowerCase()
-              .includes(val.firstName.toLowerCase()))));
-
-    }
-    
-    res.status(200).json(results);
+  else if (req.query.name) {
+    // get from database
+    conHelper.getObjectByOwnerName(req.query.name)
+      .then((success) => {
+        results = success.map(item => ({
+          objectId: item.objectId,
+          name: item.name,
+          ownerId: item.ownerId,
+          ownerUsername: item.ownerUsername,
+          description: item.description,
+          zipCode: item.zipCode,
+          isReserved: item.isReserved,
+        }));
+        res.status(200).json(results);
+        next();
+      }).catch((err) => {
+        next(err);
+      });
+  } else {
+    conHelper.getObjectByItemName('')
+      .then((success) => {
+        results = success.map(item => ({
+          objectId: item.objectId,
+          name: item.name,
+          ownerId: item.ownerId,
+          ownerUsername: item.ownerUsername,
+          description: item.description,
+          zipCode: item.zipCode,
+          isReserved: item.isReserved,
+        }));
+        res.status(200).json(results);
+        next();
+      }).catch((err) => {
+        next(err);
+      });
   }
 });
 
