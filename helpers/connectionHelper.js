@@ -187,19 +187,19 @@ function getFeed(){
 }
 
 function getObjectIdByItemName(itemName){
-  const SQL = 'SELECT objectId FROM object WHERE objectName = ?';
+  const SQL = 'SELECT objectId, name, ownerId, ownerUsername, description, pictureURL, zipCode, isReserved FROM object WHERE objectName = ?';
   return getResults(SQL, [itemName]);
 
 }
 
 function getObjectIdByZipcode(zipCode){
-  const SQL = 'SELECT objectId FROM object WHERE zipCode = ?';
+  const SQL = 'SELECT objectId, name, ownerId, ownerUsername, description, pictureURL, zipCode, isReserved FROM object WHERE zipCode = ?';
   return getResults(SQL, [zipCode]);
 
 }
 
 function getObjectIdByName(name){
-  const SQL = 'SELECT objectId FROM object JOIN user object.ownerId = user.userId WHERE user.firstName = ? OR user.lastName = ?';
+  const SQL = 'SELECT objectId, name, ownerId, ownerUsername, description, pictureURL, zipCode, isReserved FROM object WHERE user.firstName = ? OR user.lastName = ?';
   return getResults(SQL, [name, name]);
 }
 
