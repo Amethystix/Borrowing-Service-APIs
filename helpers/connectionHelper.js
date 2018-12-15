@@ -157,9 +157,14 @@ function addRating(username, rating){
   return getResults(SQL, [rating, username]);
 }
 
+function getRating(username, rating) {
+  const SQL = "SELECT averageReview FROM user WHERE username = ?";
+  return getResults(SQL, [username]);
+}
+
 
 function getUserById(userId){
-  const SQL = 'SELECT username FROM user WHERE userId = ?';
+  const SQL = 'SELECT username, averageReview FROM user WHERE userId = ?';
 
   return getResults(SQL, [userId]);
 }
@@ -180,5 +185,6 @@ module.exports = {
   getObjectByItemName,
   addRating,
   getUserById,
+  getRating,
 };
 

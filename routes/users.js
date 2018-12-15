@@ -185,14 +185,23 @@ router.get('/view', (req, res, next) => {
         pictureURL: obj.pictureURL,
         zipCode: obj.zipCode,
         isReserved: obj.isReserved,
+        averageReview: obj.averageReview,
       }));
 
-      res.status(200).json({ username, listedObjects: objects });
-      next();
+      connectionHelper.getRating(username)
+        .then((success) => {
+          res.status(200)
+            .json({ rating: success[0].averageReview, username, listedObjects: objects });
+          next();
+        }).catch((err) => {
+          next(err);
+        });
     } else {
       connectionHelper.getUserById(userId).then((results) => {
         if (results) {
-          res.status(200).json({ username: results[0].username, listedObjects: [] });
+          res.status(200).json({
+            rating: results[0].averageReview, username: results[0].username, listedObjects: []
+          });
           next();
         } else {
           res.status(404).json(makeError(404, "User doesn't exist"));
