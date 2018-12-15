@@ -2,7 +2,7 @@ const express = require('express');
 const uuidv1 = require('uuid/v1');
 const { makeError } = require('../helpers/errorHelper');
 const conHelper = require('../helpers/connectionHelper');
-const { makeToken, checkToken, getUserFromToken } = require('../helpers/tokenHelper');
+const { getUserFromToken } = require('../helpers/tokenHelper');
 
 
 const router = express.Router();
@@ -34,6 +34,7 @@ router.get('/view', (req, res, next) => {
 router.post('/add', (req, res, next) => {
   if (req.body.name && req.body.zipCode) {
     // TODO: Add image to google bucket and populate imageUrl
+
     const currUser = getUserFromToken(req.headers.authorization);
 
     const item = {
@@ -42,13 +43,13 @@ router.post('/add', (req, res, next) => {
       description: req.body.description ? req.body.description : '',
       imageUrl: '',
       itemId: uuidv1(),
-      ownerId: currUser.userId,
+      ownerId: currUser.uuid,
       ownerUsername: currUser.username,
     };
 
     conHelper.addObject(item).then((results) => {
       if (results) {
-        res.status(200).json(results);
+        res.status(200).json({ id: item.itemId });
         next();
       } else {
         res.status(400).json(makeError(400, 'Database Error'));
@@ -73,8 +74,8 @@ router.post('/borrow', (req, res, next) => {
   if (req.body.itemId) {
     const currUser = getUserFromToken(req.headers.authorization);
 
-    conHelper.loanObject(req.body.itemId, currUser.userId, currUser.username).then((results) => {
-      res.status(200).json(results[0]);
+    conHelper.loanObject(req.body.itemId, currUser.userId, currUser.username).then(() => {
+      res.status(200).json({ success: true });
       next();
     }).catch(err => next(err));
   } else {
@@ -83,9 +84,9 @@ router.post('/borrow', (req, res, next) => {
   }
 });
 
-/** Unfinished
+/**
  * Request should send an item id to return,
- will also use the auth token to determine who is returning it
+ * will also use the auth token to determine who is returning it
  */
 router.post('/return', (req, res, next) => {
   if (req.body.itemId) {

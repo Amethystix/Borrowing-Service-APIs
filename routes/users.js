@@ -97,7 +97,7 @@ router.post('/login', (req, res, next) => {
               firstName: user.firstName,
               lastName: user.lastName,
               username: user.username,
-              userId: user.userId,
+              uuid: user.userId,
             };
             const token = makeToken(user, false);
             res.status(200).json({ success: true, token, userObj });
@@ -125,10 +125,11 @@ router.post('/login', (req, res, next) => {
   }
 });
 
+
 router.get('/borrowed', (req, res, next) => {
   const user = getUserFromToken(req.headers.authorization);
 
-  connectionHelper.getUserBorrowed(user.userId).then((results) => {
+  connectionHelper.getUserBorrowed(user.uuid).then((results) => {
     if (results) {
       res.status(200).json(results);
       next();
@@ -153,6 +154,55 @@ router.get('/listed', (req, res, next) => {
   }).catch((err) => { next(err); });
 });
 
+router.post('/review', (req, res, next) => {
+  const { username, rating } = req.body;
+
+  connectionHelper.addRating(username, rating).then((results) => {
+    if (results) {
+      res.status(200).json({ user: username, rate: rating });
+      next();
+    } else {
+      res.status(500).json('database Error');
+      next();
+    }
+  }).catch((err) => { next(err); });
+});
+
+router.get('/view', (req, res, next) => {
+  const { userId } = req.query;
+
+  if (userId === undefined) {
+    res.status(422).json(makeError(422, 'No user id supplied'));
+  }
+
+  connectionHelper.getUserListed(userId).then((results) => {
+    if (results.length > 0) {
+      const username = results[0].ownerUsername;
+
+      const objects = results.map(obj => ({
+        objectId: obj.objectId,
+        objectName: obj.name,
+        description: obj.description,
+        pictureURL: obj.pictureURL,
+        zipCode: obj.zipCode,
+        isReserved: obj.isReserved,
+      }));
+
+      res.status(200).json({ username, listedObjects: objects });
+      next();
+    } else {
+      connectionHelper.getUserById(userId).then((results) => {
+        if (results) {
+          res.status(200).json({ username: results[0].username, listedObjects: [] });
+          next();
+        } else {
+          res.status(404).json(makeError(404, "User doesn't exist"));
+        }
+      }).catch(err => next(err));
+    }
+  }).catch((err) => { next(err); });
+});
+
 router.get('/auth', (req, res) => {
   if (req.headers.authorization) {
     if (checkToken(req.headers.authorization)) {
@@ -164,5 +214,6 @@ router.get('/auth', (req, res) => {
     res.status(403).json(makeError(403, 'Auth header not present'));
   }
 });
+
 
 module.exports = router;

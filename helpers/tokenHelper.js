@@ -8,7 +8,7 @@ const publicKEY = fs.readFileSync(path.join(__dirname, '../credentials/public.ke
 // Creates a JWT token
 function makeToken(user, rememberMe) {
   const {
-    username, email, firstName, lastName, userId,
+    username, email, firstName, lastName, uuid,
   } = user;
 
   const payload = {
@@ -16,7 +16,7 @@ function makeToken(user, rememberMe) {
     email,
     firstName,
     lastName,
-    userId,
+    uuid,
   };
 
   let expiresIn;
