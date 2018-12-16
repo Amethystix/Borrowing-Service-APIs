@@ -43,7 +43,6 @@ const reduce = function (key, values) {
   return sum / count;
 };
 
-
 setInterval(function() {
   
   //First reads the data from database
@@ -147,4 +146,4 @@ setInterval(function() {
   });
 
 
-}, 1800000); 
+}, 10000); 
