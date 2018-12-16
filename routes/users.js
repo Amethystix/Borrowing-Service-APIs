@@ -197,10 +197,10 @@ router.get('/view', (req, res, next) => {
           next(err);
         });
     } else {
-      connectionHelper.getUserById(userId).then((results) => {
-        if (results) {
+      connectionHelper.getUserById(userId).then((result) => {
+        if (result) {
           res.status(200).json({
-            rating: results[0].averageReview, username: results[0].username, listedObjects: []
+            rating: result[0].averageReview, username: result[0].username, listedObjects: [],
           });
           next();
         } else {
